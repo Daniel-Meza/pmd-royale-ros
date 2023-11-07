@@ -214,6 +214,9 @@ CameraNode::CameraNode(const rclcpp::NodeOptions &options)
     m_onSetParametersCbHandle = this->add_on_set_parameters_callback(std::bind(&CameraNode::onSetParameters, this, std::placeholders::_1));
     m_onSetParametersEventCbHandle = m_parametersClient.on_parameter_event(std::bind(&CameraNode::onParametersSetEvent, this, std::placeholders::_1));
 
+    // Get namespace for message headers
+    current_ns = this->get_namespace() + 1;
+
     initUseCase();
 
     start();
@@ -250,7 +253,12 @@ void CameraNode::onNewData(const royale::PointCloud *data) {
     auto curIdx = m_streamIdx[data->streamId];
 
     std_msgs::msg::Header header;
-    header.frame_id = string(this->get_name()) + "_optical_frame";
+    if (current_ns != "") {
+        header.frame_id = current_ns + "/" + string(this->get_name()) + "_optical_frame";
+    }
+    else {
+        header.frame_id = string(this->get_name()) + "_optical_frame";
+    }
     header.stamp = rclcpp::Time(
         (chrono::duration_cast<chrono::nanoseconds>(chrono::microseconds(data->timestamp))).count());
 
@@ -312,7 +320,12 @@ void CameraNode::onNewData(const royale::IRImage *data) {
     auto curIdx = m_streamIdx[data->streamId];
 
     std_msgs::msg::Header header;
-    header.frame_id = string(this->get_name()) + "_optical_frame";
+    if (current_ns != "") {
+        header.frame_id = current_ns + "/" + string(this->get_name()) + "_optical_frame";
+    }
+    else {
+        header.frame_id = string(this->get_name()) + "_optical_frame";
+    }
     header.stamp = rclcpp::Time(
         (chrono::duration_cast<chrono::nanoseconds>(chrono::microseconds(data->timestamp))).count());
 
