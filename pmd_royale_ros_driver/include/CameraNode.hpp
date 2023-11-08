@@ -101,6 +101,7 @@ class CameraNode : public rclcpp::Node,
     rclcpp::TimerBase::SharedPtr m_updateDataListenersTimer;
     std::map<royale::StreamId, uint32_t> m_streamIdx;
     std::string m_recording_file;
+    std::string current_ns;
 };
 
 } // namespace pmd_royale_ros_driver
